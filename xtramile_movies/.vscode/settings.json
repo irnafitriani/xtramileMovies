@@ -1,0 +1,11 @@
+{
+    "[json]": {
+        "editor.formatOnSave": false
+    },
+    "dart.lineLength": 100,
+    "[dart]": {
+        "editor.defaultFormatter": "Dart-Code.dart-code",
+        "editor.formatOnSave": true
+    },
+    "dart.flutterSdkPath": "/Users/irnafitriani/Documents/Polyrific/icp-mpact-rebuild/.fvm/flutter_sdk"
+}
