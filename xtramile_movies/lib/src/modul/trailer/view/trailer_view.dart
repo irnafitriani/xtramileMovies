@@ -41,48 +41,55 @@ class TrailerViewState
       appBar: AppBar(
         title: Text(widget.movieTitle),
       ),
-      body: Selector<TrailerList, List<Trailer>>(
-        selector: (_, data) => data.results,
-        builder: (context, trailers, _) {
-          return ListView.separated(
-            padding: const EdgeInsets.all(8),
-            itemCount: _controllers.length,
-            itemBuilder: (context, index) {
-              final controller = _controllers[index];
-
-              return Card(
-                child: Padding(
+      body: widget.videoIds.isEmpty
+          ? const Center(
+              child: Text(
+                "No trailer yet",
+                style: TextStyle(fontSize: 16.0),
+              ),
+            )
+          : Selector<TrailerList, List<Trailer>>(
+              selector: (_, data) => data.results,
+              builder: (context, trailers, _) {
+                return ListView.separated(
                   padding: const EdgeInsets.all(8),
-                  child: YoutubePlayer(
-                    key: ObjectKey(controller),
-                    aspectRatio: 16 / 9,
-                    enableFullScreenOnVerticalDrag: false,
-                    controller: controller
-                      ..setFullScreenListener(
-                        (_) async {
-                          final videoData = await controller.videoData;
-                          final startSeconds = await controller.currentTime;
+                  itemCount: _controllers.length,
+                  itemBuilder: (context, index) {
+                    final controller = _controllers[index];
 
-                          final currentTime = await FullscreenYoutubePlayer.launch(
-                            // ignore: use_build_context_synchronously
-                            context,
-                            videoId: videoData.videoId,
-                            startSeconds: startSeconds,
-                          );
+                    return Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: YoutubePlayer(
+                          key: ObjectKey(controller),
+                          aspectRatio: 16 / 9,
+                          enableFullScreenOnVerticalDrag: false,
+                          controller: controller
+                            ..setFullScreenListener(
+                              (_) async {
+                                final videoData = await controller.videoData;
+                                final startSeconds = await controller.currentTime;
 
-                          if (currentTime != null) {
-                            controller.seekTo(seconds: currentTime);
-                          }
-                        },
+                                final currentTime = await FullscreenYoutubePlayer.launch(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  videoId: videoData.videoId,
+                                  startSeconds: startSeconds,
+                                );
+
+                                if (currentTime != null) {
+                                  controller.seekTo(seconds: currentTime);
+                                }
+                              },
+                            ),
+                        ),
                       ),
-                  ),
-                ),
-              );
-            },
-            separatorBuilder: (context, _) => const SizedBox(height: 16),
-          );
-        },
-      ),
+                    );
+                  },
+                  separatorBuilder: (context, _) => const SizedBox(height: 16),
+                );
+              },
+            ),
     );
   }
 }

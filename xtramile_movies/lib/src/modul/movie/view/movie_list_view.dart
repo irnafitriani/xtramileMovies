@@ -43,46 +43,63 @@ class MovieListViewState
       appBar: AppBar(
         title: Text(widget.genre.name ?? ''),
       ),
-      body: Selector<MovieList, List<Movie>>(
-        selector: (_, data) => data.results,
-        builder: (context, movies, _) {
-          return RefreshIndicator(
-              onRefresh: _refreshMovieList,
-              child: movies.isEmpty
-                  ? SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height -
-                            kToolbarHeight, // Ensures it takes full height of screen
-                        child: const Center(
-                          child: Text(
-                            "There's no Movie yet",
-                            style: TextStyle(fontSize: 16.0),
+      body: Stack(
+        children: [
+          Selector<MovieList, List<Movie>>(
+            selector: (_, data) => data.results,
+            builder: (context, movies, _) {
+              return RefreshIndicator(
+                  onRefresh: _refreshMovieList,
+                  child: movies.isEmpty
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height -
+                                kToolbarHeight, // Ensures it takes full height of screen
+                            child: const Center(
+                              child: Text(
+                                "There's no Movie yet",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
                           ),
-                        ),
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          itemCount: movies.length,
+                          itemBuilder: (context, index) {
+                            var movie = movies[index];
+                            return ListTile(
+                              leading: Image.network(
+                                'https://image.tmdb.org/t/p/w92${movie.posterPath}',
+                                fit: BoxFit.cover,
+                              ),
+                              title: Text(movie.title ?? ''),
+                              subtitle: Text(
+                                  'Release Date: ${movie.releaseDate}\nRating: ${movie.voteAverage}'),
+                              onTap: () {
+                                context.router.push(MovieDetailView(
+                                    movieId: movie.id ?? 0, movieTitle: movie.title ?? ''));
+                              },
+                            );
+                          },
+                        ));
+            },
+          ),
+          Selector<MovieList, bool>(
+            selector: (_, data) => data.showLoading ?? false,
+            builder: (context, showLoading, _) {
+              return showLoading
+                  ? Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      itemCount: movies.length,
-                      itemBuilder: (context, index) {
-                        var movie = movies[index];
-                        return ListTile(
-                          leading: Image.network(
-                            'https://image.tmdb.org/t/p/w92${movie.posterPath}',
-                            fit: BoxFit.cover,
-                          ),
-                          title: Text(movie.title ?? ''),
-                          subtitle: Text(
-                              'Release Date: ${movie.releaseDate}\nRating: ${movie.voteAverage}'),
-                          onTap: () {
-                            context.router.push(MovieDetailView(
-                                movieId: movie.id ?? 0, movieTitle: movie.title ?? ''));
-                          },
-                        );
-                      },
-                    ));
-        },
+                  : const SizedBox.shrink();
+            },
+          )
+        ],
       ),
     );
   }

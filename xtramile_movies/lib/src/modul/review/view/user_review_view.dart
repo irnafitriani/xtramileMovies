@@ -41,35 +41,52 @@ class UserReviewViewState
       appBar: AppBar(
         title: const Text('User Reviews'),
       ),
-      body: Selector<ReviewList, List<Review>>(
-        selector: (_, data) => data.results,
-        builder: (context, userReviews, _) {
-          return RefreshIndicator(
-              onRefresh: _refreshReviewList,
-              child: userReviews.isEmpty
-                  ? SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height - kToolbarHeight,
-                        child: const Center(
-                          child: Text(
-                            "There's no Review yet",
-                            style: TextStyle(fontSize: 16.0),
+      body: Stack(
+        children: [
+          Selector<ReviewList, List<Review>>(
+            selector: (_, data) => data.results,
+            builder: (context, userReviews, _) {
+              return RefreshIndicator(
+                  onRefresh: _refreshReviewList,
+                  child: userReviews.isEmpty
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height - kToolbarHeight,
+                            child: const Center(
+                              child: Text(
+                                "There's no Review yet",
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
                           ),
-                        ),
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          itemCount: userReviews.length,
+                          itemBuilder: (context, index) {
+                            if (index == userReviews.length) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            return ReviewTile(review: userReviews[index]);
+                          },
+                        ));
+            },
+          ),
+          Selector<ReviewList, bool>(
+            selector: (_, data) => data.showLoading ?? false,
+            builder: (context, showLoading, _) {
+              return showLoading
+                  ? Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      itemCount: userReviews.length,
-                      itemBuilder: (context, index) {
-                        if (index == userReviews.length) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        return ReviewTile(review: userReviews[index]);
-                      },
-                    ));
-        },
+                  : const SizedBox.shrink();
+            },
+          )
+        ],
       ),
     );
   }

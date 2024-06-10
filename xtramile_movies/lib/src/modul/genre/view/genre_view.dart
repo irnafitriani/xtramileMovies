@@ -31,45 +31,61 @@ class GenreViewState extends ViewModelScreenStflState<GenreView, GenreViewModel,
       appBar: AppBar(
         title: const Text('Movie Genres'),
       ),
-      body: Selector<GenresResponse, List<Genre>>(
-        selector: (_, data) => data.genres,
-        builder: (context, genres, _) {
-          return RefreshIndicator(
-            onRefresh: _refreshGenres,
-            child: genres.isEmpty
-                ? SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height -
-                          kToolbarHeight, // Ensures it takes full height of screen
-                      child: const Center(
-                        child: Text(
-                          "There's no genre yet",
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: genres.length,
-                    itemBuilder: (context, index) {
-                      var genre = genres[index];
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(genreIcons[genre.name] ?? Icons.movie),
-                            title: Text(genre.name ?? ''),
-                            onTap: () {
-                              context.router.push(MovieListView(genre: genre));
-                            },
+      body: Stack(
+        children: [
+          Selector<GenresResponse, List<Genre>>(
+            selector: (_, data) => data.genres,
+            builder: (context, genres, _) {
+              return RefreshIndicator(
+                onRefresh: _refreshGenres,
+                child: genres.isEmpty
+                    ? SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height - kToolbarHeight,
+                          child: const Center(
+                            child: Text(
+                              "There's no genre yet",
+                              style: TextStyle(fontSize: 16.0),
+                            ),
                           ),
-                          if (index != genres.length - 1) const Divider(),
-                        ],
-                      );
-                    },
-                  ),
-          );
-        },
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: genres.length,
+                        itemBuilder: (context, index) {
+                          var genre = genres[index];
+                          return Column(
+                            children: [
+                              ListTile(
+                                leading: Icon(genreIcons[genre.name] ?? Icons.movie),
+                                title: Text(genre.name ?? ''),
+                                onTap: () {
+                                  context.router.push(MovieListView(genre: genre));
+                                },
+                              ),
+                              if (index != genres.length - 1) const Divider(),
+                            ],
+                          );
+                        },
+                      ),
+              );
+            },
+          ),
+          Selector<GenresResponse, bool>(
+            selector: (_, data) => data.showLoading ?? false,
+            builder: (context, showLoading, _) {
+              return showLoading
+                  ? Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
     );
   }

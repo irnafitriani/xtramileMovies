@@ -37,139 +37,157 @@ class MovieDetailViewState
       appBar: AppBar(
         title: Text(widget.movieTitle),
       ),
-      body: Selector<MovieDetailData, MovieDetail?>(
-        selector: (_, data) => data.movieDetail,
-        builder: (context, movieDetail, _) {
-          return RefreshIndicator(
-            onRefresh: _refreshMovieDetail,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (movieDetail?.posterPath != null)
-                    Image.network(
-                      'https://image.tmdb.org/t/p/w500${movieDetail?.posterPath}',
-                      fit: BoxFit.cover,
-                    ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    movieDetail?.title ?? '',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    'Release Date: ${movieDetail?.releaseDate ?? "Unknown"}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    'Rating: ${movieDetail?.voteAverage ?? "-"}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    'Overview:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    movieDetail?.overview ?? '',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16.0),
-                  GestureDetector(
-                    onTap: () {
-                      context.router.push(UserReviewView(movieId: movieDetail?.id ?? 0));
-                    },
-                    child: const Text(
-                      'See All User Reviews',
-                      style: TextStyle(fontSize: 16, color: Colors.blue),
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    'Genres:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Wrap(
-                    spacing: 8.0,
-                    children: movieDetail?.genres.map((genre) {
-                          return Chip(
-                            label: Text(genre.name ?? ''),
-                          );
-                        }).toList() ??
-                        [],
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    'Production Companies:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Column(
+      body: Stack(
+        children: [
+          Selector<MovieDetailData, MovieDetail?>(
+            selector: (_, data) => data.movieDetail,
+            builder: (context, movieDetail, _) {
+              return RefreshIndicator(
+                onRefresh: _refreshMovieDetail,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: movieDetail?.productionCompanies.map((company) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              children: [
-                                if (company.logoPath != null)
-                                  Image.network(
-                                    'https://image.tmdb.org/t/p/w92${company.logoPath}',
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                                const SizedBox(width: 8.0),
-                                Expanded(
-                                  child: Text(
-                                    company.name ?? '',
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
+                    children: [
+                      if (movieDetail?.posterPath != null)
+                        Image.network(
+                          'https://image.tmdb.org/t/p/w500${movieDetail?.posterPath}',
+                          fit: BoxFit.cover,
+                        ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        movieDetail?.title ?? '',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        'Release Date: ${movieDetail?.releaseDate ?? "Unknown"}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        'Rating: ${movieDetail?.voteAverage ?? "-"}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Overview:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        movieDetail?.overview ?? '',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16.0),
+                      GestureDetector(
+                        onTap: () {
+                          context.router.push(UserReviewView(movieId: movieDetail?.id ?? 0));
+                        },
+                        child: const Text(
+                          'See All User Reviews',
+                          style: TextStyle(fontSize: 16, color: Colors.blue),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Genres:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Wrap(
+                        spacing: 8.0,
+                        children: movieDetail?.genres.map((genre) {
+                              return Chip(
+                                label: Text(genre.name ?? ''),
+                              );
+                            }).toList() ??
+                            [],
+                      ),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Production Companies:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: movieDetail?.productionCompanies.map((company) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Row(
+                                  children: [
+                                    if (company.logoPath != null)
+                                      Image.network(
+                                        'https://image.tmdb.org/t/p/w92${company.logoPath}',
+                                        width: 50,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    const SizedBox(width: 8.0),
+                                    Expanded(
+                                      child: Text(
+                                        company.name ?? '',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        }).toList() ??
-                        [],
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    'Tagline:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    movieDetail?.tagline ?? '',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    'Status:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    movieDetail?.status ?? '',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      final videoIds =
-                          viewModel.value.trailers?.map((trailer) => trailer.key ?? '').toList() ??
+                              );
+                            }).toList() ??
+                            [],
+                      ),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Tagline:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        movieDetail?.tagline ?? '',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Status:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        movieDetail?.status ?? '',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          final videoIds = viewModel.value.trailers
+                                  ?.map((trailer) => trailer.key ?? '')
+                                  .toList() ??
                               [];
-                      context.router.push(
-                          TrailerView(videoIds: videoIds, movieTitle: movieDetail?.title ?? ''));
-                    },
-                    child: const Text('Watch All Trailers'),
+                          context.router.push(TrailerView(
+                              videoIds: videoIds, movieTitle: movieDetail?.title ?? ''));
+                        },
+                        child: const Text('Watch All Trailers'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
+                ),
+              );
+            },
+          ),
+          Selector<MovieDetailData, bool>(
+            selector: (_, data) => data.showLoading ?? false,
+            builder: (context, showLoading, _) {
+              return showLoading
+                  ? Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : const SizedBox.shrink();
+            },
+          )
+        ],
       ),
     );
   }
